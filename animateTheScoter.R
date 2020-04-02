@@ -70,15 +70,20 @@ write_csv(geocoded,"output/geocodedSites.csv")
 
 # geocoded = read_csv("output/geocodedSites.csv")
 
+
 geoCodedScoter = cleanScoter %>% 
   left_join(geocoded) %>% 
   select(obsID,ObsTime,locationToSearch, lon,lat,)
 
 
+# Filter data for specified date range ------------------------------------
 
 baseDate = dmy("31-03-2020")
 dusk = baseDate + hours(18)
 dawn = baseDate + days(1) + hours(6)
+
+
+# Generate a static plot --------------------------------------------------
 
 toPlot = geoCodedScoter %>% 
   filter(ObsTime >= dusk,
@@ -92,6 +97,10 @@ static = ggplot(toPlot) +
   theme_void() 
 
 static
+
+
+# ... and animate it! -----------------------------------------------------
+
 
 anim = animate(static + 
           transition_components(ObsTime,
