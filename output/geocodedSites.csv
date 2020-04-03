@@ -26,7 +26,7 @@ locationToSearch,lat,lon
 "Norwich, 52.622182, 1.283867, Norfolk, UK",52.628606,1.29227
 "Stalham, Norfolk, UK",52.7718428,1.5151178
 "Thetford, Norfolk, UK",52.42931905,0.7239059303289652
-"Carrickmacross, Monaghan, IE, ",53.977174,-6.7187084
+"Carrickmacross, Monaghan, IE,",53.977174,-6.7187084
 "Mossley Hill, Merseyside, UK",NA,NA
 "Maghull, Merseyside, UK",NA,NA
 "Green Lanes, Manor House, London N4, London, UK",51.5712809,-0.0963301
@@ -37,7 +37,7 @@ locationToSearch,lat,lon
 "Moss Side, Greater Manchester, UK",53.4547635,-2.2442531
 "Stalybridge, Greater Manchester, UK",53.4840214,-2.0562536
 "Wanstead E11, Greater London, UK",51.5756739,0.0277989
-"Barna, Galway, IE, ",53.2704341,-9.112482301223777
+"Barna, Galway, IE,",53.2704341,-9.112482301223777
 "Hull, East Yorkshire, UK",53.76238625,-0.3301213755327681
 "Hunmanby, East Yorkshire, UK",54.166474,-0.32914306862192966
 "Nafferton, East Yorkshire, UK",54.02117815,-0.39246578438545315
@@ -53,7 +53,7 @@ locationToSearch,lat,lon
 "Chorlton, Greater Manchester, UK",53.4404341,-2.2844155497796406
 "Scarborough, North Yorkshire, UK",54.2820009,-0.4011868
 "Upton, Yorkshire, UK",53.6137249,-1.2861785
-"Merrion, Dublin, IE, ",53.3184896,-6.209040402532124
+"Merrion, Dublin, IE,",53.3184896,-6.209040402532124
 "Sudbury, Suffolk, UK",52.0401524,0.7299495
 "Banbury, Oxfordshire, UK",52.0605712,-1.3277563
 "South Shields, Durham, UK",NA,NA
@@ -86,3 +86,73 @@ locationToSearch,lat,lon
 "Stafford, Staffordshire, UK",52.8063157,-2.1163818
 "Winsford, Cheshire, UK",53.1920711,-2.5313108
 "Dungeness, Kent, UK",50.9141783,0.9728941
+"St Albans AL1, Hertfordshire, UK",51.7492956,-0.3422526
+"Crosby, Merseyside, UK",53.4844386,-3.0291758
+"Macclesfield, Cheshire, UK",53.2606635,-2.1255158
+"Mytholmroyd, West Yorkshire, UK",53.7293672,-1.9797285
+"Severn Beach, Avon/South Gloucestershire, UK",NA,NA
+"Cardiff, East Glamirgan, UK",NA,NA
+"Chippenham, Wiltshire, UK",51.4622697,-2.116144
+"Wewlyn Garden City, Hertfordshire, UK",NA,NA
+"Welwyn Garden City, Hertfordshire, UK",51.8031083,-0.2068872
+"Louth, Lincolnshire, UK",53.3675163,-0.0022381
+"Welwtn Garden City, Hertfordshire, UK",NA,NA
+"Heacham, Norfolk, UK",52.907267000000004,0.49601463592292316
+"Pocklington, East Yorks, UK",NA,NA
+"Cottingham, E Yorks, UK",NA,NA
+"Thame, Oxfordshire, UK",51.7482733,-0.9781805
+"Skegness, Lincolnshire, UK",53.1437506,0.3428958
+"Finchley, London, UK",51.5973246,-0.1805587
+"Dursely, Gloucestershire, UK",NA,NA
+"Nailsworth, Gloucestershire, UK",51.6952392,-2.2185599
+"Tufnell Park, London, UK",51.5568005,-0.138457
+"Swindon, Wiltshire, UK",51.5613683,-1.7856853
+"Scalford, Melton Mowbray, Leicestershire, UK",52.7669983,-0.8879621
+"Doncaster, South Yorkshire, UK",53.5227681,-1.1335312
+"Stutton, Suffolk, UK",51.9705923,1.1280032
+"Hoghton, Lancashire, UK",53.7367589,-2.5965017
+"Severn Beach, South Gloucestershire, UK",51.5596805,-2.6645557
+"York, North Yorkshire, UK",53.9590555,-1.0815361
+"Haxby, North Yorkshire, UK",54.0175196,-1.0730544
+"Chiswick W4, Greater London, UK",51.4923137,-0.263818
+"Dursley, Gloucestershire, UK",51.6811933,-2.3551877
+"Longton, Lancashire, UK",53.7267651,-2.7818758
+"Wyke, Shropshire, UK",52.6575699,-2.4004544
+"Fulford, York, North Yorkshire, UK",53.9373984,-1.0721171
+"Ipswich, Suffolk, UK",52.0579495,1.1526345
+"Wakefield, West Yorkshire, UK",NA,NA
+"Baldock, Hertfordshire, UK",51.9889973,-0.1882079
+"Chesterton, Cambridgeshire, UK",52.2222881,0.1445917
+"Whitchurch, Bristol, Avon, UK",NA,NA
+"Bedminster, Bristol, Avon, UK",NA,NA
+"Berkhamsted, Hertfordshire, UK",51.75514375,-0.5557681023902674
+"Grimston, Melton Mowbray, Leicestershire, UK",NA,NA
+"Farncombe, Surrey, UK",51.1956925,-0.6056463
+"Shipham, Somerset, UK",51.313757,-2.7987407
+"scarborough, North Yorkshire, UK",54.2820009,-0.4011868
+"Kingswood, Hull, East Yorkshire, UK",53.7994607,-0.3530902
+"Eaton Ford, Cambridgeshire, UK",52.2264391,-0.28072
+"Poulton-le-Fylde, Lancashire, UK",53.8461465,-2.9904844
+"Soil Hill, West Yorkshire, UK",53.7775993,-1.8847413
+"Woodbridge, Suffolk, UK",52.0940952,1.3201301
+"Liverpook, Merseyside, UK",NA,NA
+"Liverpool, Merseyside, UK",NA,NA
+"Reading, Berkshire, UK",51.456659,-0.9696512
+"Fletchertown, Aspatria, Cumbria, UK",NA,NA
+"Great Corby, Cumbria, UK",54.8813838,-2.8232718
+"Bagby, North Yorkshire, UK",54.2181266,-1.2903728
+"Beverley, East Yorkshire, UK",53.8432607,-0.4317193498925199
+"Rossendale, Lancashire, UK",53.6848806,-2.261439758907419
+"Buscot Wick, Oxfordshire, UK",NA,NA
+"Edgware, Greater London, UK",51.613673,-0.2749398
+"Byfield, Northamptonshire, UK",52.1744947,-1.2480551
+"Bowburn, Durham, UK",54.7395825,-1.5242761
+"Torry, Aberdeenshire, UK",57.4462123,-2.7898715
+"Filey, North Yorkshire, UK",54.2096884,-0.2888382
+"Marlow Bottom, Buckinghamshire, UK",51.5912301,-0.7853656
+"Wark, North Tyne, Northumberland, UK",NA,NA
+"Henleaze, Bristol, UK",51.4845899,-2.6112053
+"Oxford, Oxfordshire, UK",51.7520131,-1.2578499
+"Normanby, North Lincolnshire, UK",53.6398884,-0.6676919
+"Alkborough, North Lincolnshire, UK",53.6847946,-0.6655823
+"Bridgwater, Somerset, UK",51.1283378,-3.0037046

@@ -27,19 +27,29 @@ uk = map_data("world",region = c("uk","ireland"))
 # Load and clean input data -----------------------------------------------
 
 # TODO: pull data direct with googlesheets package - needs to be "Published to web"?
+# TODO: data cleaning:
+#         quite a few typos in site names; 
+#         some gaps in cols etc; 
+#         dodgy date format
 
 rawScoter = read_csv("input/Common Scoter passage record sheet_2020 - Sheet1.csv")
 
 cleanScoter = rawScoter %>% 
   mutate(obsID = row_number(),
-         ObsTime = dmy_hm(paste(Date,Time_flock_first_encountered)),
+         ObsTime = dmy_hm(paste(Date,Time)),
+         # create a variable indicating which night we're plotting; use 6pm threshold
+         baseDate = if_else(hour(ObsTime) >= 18, 
+                            date(ObsTime),
+                            date(ObsTime) - days(1)),
          # would be better to have country as a separate column - this is a hack
          locationToSearch = paste(Location,County,
                                   if_else(str_detect(County,"IE"),"", "UK"),
                                   sep = ", "),
          locationToSearch = str_trim(locationToSearch)) %>%
-  filter(`Recorded/Heard` != "0")
+  mutate(includeInVis = toupper(`Scoter present`) == "Y")
 
+# check number of records per night
+cleanScoter %>% count(baseDate) %>% arrange(-n)
 
 # Geocoding sites ---------------------------------------------------------
 
@@ -55,40 +65,46 @@ geocoder = function(location) {
   geo
 }
 
-# this will take a minute or two...
-geocoded = sites %>% 
-  mutate(geocode = map(locationToSearch,
-                       # handle geocoding errors
-                        possibly(geocoder,otherwise = list()))) 
+# aim to top up existing list of geocoded sites
+allGeo = read_csv("output/geocodedSites.csv")
 
-geocoded = geocoded %>% 
-  unnest_wider(geocode) %>% 
-  select(locationToSearch,lat,lon)
+newSites = sites %>% anti_join(allGeo)
 
-# cache results for future use
-write_csv(geocoded,"output/geocodedSites.csv")
-
-# geocoded = read_csv("output/geocodedSites.csv")
-
+if (nrow(newSites) > 0){
+  # this will take a minute or two...
+  newGeo = newSites %>% 
+    mutate(geocode = map(locationToSearch,
+                         # handle geocoding errors
+                         possibly(geocoder,otherwise = list()))) 
+  
+  newGeo = newGeo %>% 
+    unnest_wider(geocode) %>% 
+    select(locationToSearch,lat,lon)
+  
+  allGeo = rbind(existingGeoCodes,newGeo)
+  
+  
+  # cache results for future use
+  write_csv(allGeo,"output/geocodedSites.csv")
+  }
 
 geoCodedScoter = cleanScoter %>% 
-  left_join(geocoded) %>% 
-  select(obsID,ObsTime,locationToSearch, lon,lat,)
+  left_join(allGeo) %>% 
+  select(obsID,baseDate,ObsTime, locationToSearch, lon,lat,includeInVis)
 
 
 # Filter data for specified date range ------------------------------------
 
-baseDate = dmy("31-03-2020")
-dusk = baseDate + hours(18)
-dawn = baseDate + days(1) + hours(6)
-
+nightToPlot = dmy("02-04-2020")
 
 # Generate a static plot --------------------------------------------------
 
 toPlot = geoCodedScoter %>% 
-  filter(ObsTime >= dusk,
-         ObsTime <= dawn,
-         !is.na(lat))
+  filter(baseDate == nightToPlot,
+         (hour(ObsTime) >=18 || hour(ObsTime) < 7),
+         !is.na(lat),
+         lat != 0,
+         includeInVis)
 
 static = ggplot(toPlot) + 
   geom_polygon(data = uk , aes(x=long, y = lat, group = group),fill = "grey90") +
@@ -103,17 +119,17 @@ static
 
 
 anim = animate(static + 
-          transition_components(ObsTime,
-                                enter_length = as_datetime(hm("0:5")),
-                                exit_length = as_datetime(hm("0:15"))) + 
-          enter_fade() +
-          exit_fade() +
-          ggtitle("Common Scoter nocturnal migration tracker",
-                  subtitle = "Time: {format(frame_time, '%d %B %y, %H:%M')}"),
-        nframes = 200,
-        fps = 5
-        
-)
+                 transition_components(ObsTime,
+                                       enter_length = as_datetime(hm("0:5")),
+                                       exit_length = as_datetime(hm("0:15"))) + 
+                 enter_fade() +
+                 exit_fade() +
+                 ggtitle("Common Scoter nocturnal migration tracker",
+                         subtitle = "Time: {format(frame_time, '%d %B %y, %H:%M')}"),
+               nframes = 200,
+               fps = 5)
+
+anim
 
 anim_save(str_glue("output/scoter_{baseDate}.gif"))
 
