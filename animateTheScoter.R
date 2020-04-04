@@ -37,6 +37,7 @@ rawScoter = read_csv("input/Common Scoter passage record sheet_2020 - Sheet1.csv
 cleanScoter = rawScoter %>% 
   mutate(obsID = row_number(),
          ObsTime = dmy_hm(paste(Date,Time)),
+         roundedTime = floor_date(ObsTime,"15 minutes"),
          # create a variable indicating which night we're plotting; use 6pm threshold
          baseDate = if_else(hour(ObsTime) >= 18, 
                             date(ObsTime),
@@ -90,46 +91,62 @@ if (nrow(newSites) > 0){
 
 geoCodedScoter = cleanScoter %>% 
   left_join(allGeo) %>% 
-  select(obsID,baseDate,ObsTime, locationToSearch, lon,lat,includeInVis)
+  select(obsID,baseDate,ObsTime,roundedTime,locationToSearch, lon,lat,includeInVis)
 
 
 # Filter data for specified date range ------------------------------------
 
-nightToPlot = dmy("02-04-2020")
+nights = seq.Date(dmy("31-03-2020"),
+                dmy("02-04-2020"),
+                by = "day")
 
-# Generate a static plot --------------------------------------------------
-
-toPlot = geoCodedScoter %>% 
-  filter(baseDate == nightToPlot,
-         (hour(ObsTime) >=18 || hour(ObsTime) < 7),
-         !is.na(lat),
-         lat != 0,
-         includeInVis)
-
-static = ggplot(toPlot) + 
-  geom_polygon(data = uk , aes(x=long, y = lat, group = group),fill = "grey90") +
-  geom_point(aes(x = lon,y = lat,group = obsID),color = "red",size = 3) +
-  coord_map() +
-  theme_void() 
-
-static
-
-
-# ... and animate it! -----------------------------------------------------
-
-
-anim = animate(static + 
-                 transition_components(ObsTime,
-                                       enter_length = as_datetime(hm("0:5")),
-                                       exit_length = as_datetime(hm("0:15"))) + 
-                 enter_fade() +
-                 exit_fade() +
-                 ggtitle("Common Scoter nocturnal migration tracker",
-                         subtitle = "Time: {format(frame_time, '%d %B %y, %H:%M')}"),
-               nframes = 200,
-               fps = 5)
-
-anim
-
-anim_save(str_glue("output/scoter_{baseDate}.gif"))
+for (i in 1:length(nights)) {
+  
+  nightToPlot = nights[i]
+  
+  nightStr = as.character(nightToPlot,format = "%d-%b-%y")
+  print(nightStr)
+  # nightToPlot = dmy("31-03-2020")
+  
+  # Generate a static plot --------------------------------------------------
+  
+  toPlot = geoCodedScoter %>% 
+    filter(baseDate == nightToPlot,
+           (hour(ObsTime) >=18 | hour(ObsTime) < 7),
+           !is.na(lat),
+           lat != 0,
+           includeInVis)
+  
+  static = ggplot(toPlot) + 
+    geom_polygon(data = uk , aes(x=long, y = lat, group = group),fill = "white") +
+    geom_point(aes(x = lon,y = lat,group = obsID),color = "red",
+               size = 3) +
+    coord_map() +
+    theme_void() +
+    theme(panel.background = element_rect(fill = "black"))
+  
+  static
+  
+  
+  # ... and animate it! -----------------------------------------------------
+  nHrsInPlot = hour(as.period(max(toPlot$roundedTime) - min(toPlot$roundedTime),"hours"))
+  
+  anim = animate(static + 
+                   transition_components(roundedTime,
+                                         # # enter_length = as_datetime(hm("0:5")),
+                                         exit_length = as_datetime(hm("0:30"))) + 
+                   # enter_fade() +
+                   exit_fade() +
+                   exit_shrink() +
+                   shadow_mark(past = T,future = F,alpha = 0.3,size = size/2) +
+                   ggtitle("Common Scoter nocturnal migration tracker",
+                           subtitle = "Time: {format(frame_time, '%d %B %y, %H:%M')}"),
+                 # nframes = 50,
+                 nHrsInPlot * 12,
+                 fps = 5)
+  
+  # anim
+  
+  anim_save(str_glue("output/scoter_{nightStr}.gif"))
+}
 
