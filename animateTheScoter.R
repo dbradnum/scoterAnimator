@@ -135,7 +135,7 @@ theme_black <- function (base_size = 16, base_family = ""){
 # Generate plots for specified date range ------------------------------------
 
 nights = seq.Date(dmy("31-03-2020"),
-                dmy("02-04-2020"),
+                dmy("03-04-2020"),
                 by = "day")
 
 for (i in 1:length(nights)) {
@@ -205,7 +205,7 @@ toPlotCombined = geoCodedScoter %>%
 static = ggplot(toPlotCombined) + 
   geom_polygon(data = uk , aes(x=long, y = lat, group = group),fill = "white") +
   geom_point(aes(x = lon,y = lat,group = obsID,color = Night),
-             size = 3) +
+             size = 4) +
   coord_map() +
   theme_black() 
 
