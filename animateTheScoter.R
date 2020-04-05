@@ -167,13 +167,16 @@ for (i in 1:length(nights)) {
     theme_black() +
     # theme_ft_rc(grid = F) +
     labs(title = "Common Scoter Nocturnal Migration",
-         subtitle = "01:00",
-         caption = str_glue("{format(nightToPlot,'%d %B %Y')}")) +
-    theme(plot.caption = element_text(hjust=0.5, size=rel(1)),
-          plot.title = element_text(size = rel(1.2),face = "bold"),
-          plot.subtitle = element_text(size = rel(2.5),face = "bold",
-                                       hjust = 1,
-                                       margin = margin(t = -25,)))
+         subtitle = "D. Bradnum, J. Dunning, A. Lees, O.Metcalf",
+         caption = str_glue("{format(nightToPlot,'%d %B %Y')}"),
+         tag = "01:00") +
+    theme(plot.title = element_text(size = rel(1.5),face = "bold"),
+          plot.subtitle = element_text(size = rel(0.9),face = "italic"),
+          plot.caption = element_text(hjust=0.5, size=rel(1.2)),
+          plot.tag = element_text(margin = margin(l = -100,
+                                                  b = -40),
+                                  size = rel(3),face = "bold"),
+          plot.tag.position = "topright")
   
   static
   
@@ -192,11 +195,12 @@ for (i in 1:length(nights)) {
                    exit_shrink() +
                    shadow_mark(past = T,future = F,alpha = 0.4,size = size/2) +
                    labs(title = "Common Scoter Nocturnal Migration",
-                        subtitle = "{format(frame_time, '%H:%M')}",
+                        subtitle = "D. Bradnum, J. Dunning, A. Lees, O.Metcalf",
+                        tag = "{format(frame_time, '%H:%M')}",
                         caption = "{format(frame_time,'%d %B %Y')}"),
                  end_pause = 20,
-                 nframes = 50,
-                 # nframes = nHrsInPlot * 60,
+                 # nframes = 50,
+                 nframes = nHrsInPlot * 60,
                  fps = 8,
                  width = 600,
                  height = 600,
