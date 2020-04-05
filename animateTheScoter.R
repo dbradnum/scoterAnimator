@@ -7,6 +7,9 @@ library(sp)
 library(ggmap)
 library(hrbrthemes)
 
+remotes::install_github("wilkelab/ggtext")
+library(ggtext)
+
 Sys.setenv(TZ='UTC')
 
 
@@ -122,10 +125,6 @@ theme_black <- function (base_size = 16, base_family = font_rc ){
                           face = "plain", colour = "white", size = base_size,
                           angle = 0, lineheight = 0.9, hjust = 0, vjust = 0),
       plot.background = element_rect(colour = 'black', fill = 'black'),
-      plot.title = element_text(size = rel(1.2),face = "bold"),
-      # panel.border = element_rect(fill = NA, colour = "white"), 
-      # panel.grid.major = element_line(colour = "grey20", size = 0.2), 
-      # panel.grid.minor = element_line(colour = "grey5", size = 0.5),
       strip.background = element_rect(fill = "grey30", colour = "grey30"),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
@@ -140,8 +139,8 @@ theme_black <- function (base_size = 16, base_family = font_rc ){
 # Generate plots for specified date range ------------------------------------
 
 nights = seq.Date(dmy("31-03-2020"),
-                dmy("03-04-2020"),
-                by = "day")
+                  dmy("03-04-2020"),
+                  by = "day")
 
 for (i in 1:length(nights)) {
   
@@ -167,7 +166,14 @@ for (i in 1:length(nights)) {
     coord_map(xlim = c(-14,4)) +
     theme_black() +
     # theme_ft_rc(grid = F) +
-    ggtitle("Common Scoter Nocturnal Migration \n")
+    labs(title = "Common Scoter Nocturnal Migration",
+         subtitle = "01:00",
+         caption = str_glue("{format(nightToPlot,'%d %B %Y')}")) +
+    theme(plot.caption = element_text(hjust=0.5, size=rel(1)),
+          plot.title = element_text(size = rel(1.2),face = "bold"),
+          plot.subtitle = element_text(size = rel(2.5),face = "bold",
+                                       hjust = 1,
+                                       margin = margin(t = -25,)))
   
   static
   
@@ -185,17 +191,20 @@ for (i in 1:length(nights)) {
                    exit_fade() +
                    exit_shrink() +
                    shadow_mark(past = T,future = F,alpha = 0.4,size = size/2) +
-                   ggtitle("Common Scoter Nocturnal Migration: {format(frame_time, '%d %B %Y, %H:%M')}"),
-                 # nframes = 50,
-                 nframes = nHrsInPlot * 60,
+                   labs(title = "Common Scoter Nocturnal Migration",
+                        subtitle = "{format(frame_time, '%H:%M')}",
+                        caption = "{format(frame_time,'%d %B %Y')}"),
+                 end_pause = 20,
+                 nframes = 50,
+                 # nframes = nHrsInPlot * 60,
                  fps = 8,
                  width = 600,
                  height = 600,
                  bg = "transparent")
   
-  # anim
+  anim 
   
-  anim_save(str_glue("output/scoter_hiFreq_{nightStr}.gif"))
+  anim_save(str_glue("output/temp_scoter_hiFreq_{nightStr}.gif"))
 }
 
 
