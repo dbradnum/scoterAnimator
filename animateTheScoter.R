@@ -5,6 +5,7 @@ library(gifski)
 library(tmaptools)
 library(sp)
 library(ggmap)
+library(hrbrthemes)
 
 Sys.setenv(TZ='UTC')
 
@@ -46,7 +47,11 @@ cleanScoter = rawScoter %>%
          # variable for actual time appended to single consistent date- to combine all points
          standardisedTime = as_datetime(today()) + 
            hours(hour(ObsTime)) + minutes(minute(ObsTime)) + 
-           days(if_else(isEarlyAM,1,0)), 
+           days(if_else(isEarlyAM,1,0)),
+         hoursAfter8pm = as.numeric(difftime(standardisedTime,
+                                               today() + hours(20),
+                                               units = "hours")),
+         County = replace_na(County,""),
          # would be better to have country as a separate column - bit of a hack here
          locationToSearch = paste(Location,County,
                                   if_else(str_detect(County,"IE"),"", "UK"),
@@ -102,11 +107,11 @@ dataToFix = geoCodedScoter %>%
   filter(noGeoCode | invalidDateTime) %>% 
   write_csv("output/dataQualityIssues.csv")
 
-
+write_csv(geoCodedScoter,"output/cleanData.csv")
 
 # Theme for plots ---------------------------------------------------------
 
-theme_black <- function (base_size = 16, base_family = ""){
+theme_black <- function (base_size = 16, base_family = font_rc ){
   theme_minimal() %+replace% 
     theme(
       line = element_line(colour = "white", size = 0.5, linetype = 1, 
@@ -117,7 +122,7 @@ theme_black <- function (base_size = 16, base_family = ""){
                           face = "plain", colour = "white", size = base_size,
                           angle = 0, lineheight = 0.9, hjust = 0, vjust = 0),
       plot.background = element_rect(colour = 'black', fill = 'black'),
-      plot.title = element_text(size = rel(1.2)),
+      plot.title = element_text(size = rel(1.2),face = "bold"),
       # panel.border = element_rect(fill = NA, colour = "white"), 
       # panel.grid.major = element_line(colour = "grey20", size = 0.2), 
       # panel.grid.minor = element_line(colour = "grey5", size = 0.5),
@@ -160,14 +165,17 @@ for (i in 1:length(nights)) {
     geom_point(aes(x = lon,y = lat,group = obsID),color = "orange",
                size = 4) +
     coord_map(xlim = c(-14,4)) +
-    theme_black() + 
+    theme_black() +
+    # theme_ft_rc(grid = F) +
     ggtitle("Common Scoter Nocturnal Migration \n")
   
   static
   
   
   # ... and animate it! -----------------------------------------------------
-  nHrsInPlot = hour(as.period(max(toPlot$roundedTime) - min(toPlot$roundedTime),"hours"))
+  nHrsInPlot = as.numeric(difftime(max(toPlot$roundedTime), 
+                                   min(toPlot$roundedTime),
+                                   units = "hours"))
   
   anim = animate(static + 
                    transition_components(ObsTime,
