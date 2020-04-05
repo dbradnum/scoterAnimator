@@ -172,7 +172,7 @@ for (i in 1:length(nights)) {
          tag = "01:00") +
     theme(plot.title = element_text(size = rel(1.5),face = "bold"),
           plot.subtitle = element_text(size = rel(0.9),face = "italic"),
-          plot.caption = element_text(hjust=0.5, size=rel(1.2)),
+          plot.caption = element_text(hjust=0.5, size=rel(1.5)),
           plot.tag = element_text(margin = margin(l = -100,
                                                   b = -40),
                                   size = rel(3),face = "bold"),
@@ -182,12 +182,16 @@ for (i in 1:length(nights)) {
   
   
   # ... and animate it! -----------------------------------------------------
-  nHrsInPlot = as.numeric(difftime(max(toPlot$roundedTime), 
-                                   min(toPlot$roundedTime),
-                                   units = "hours"))
+  nHrsInPlot = as.numeric(difftime(as.POSIXct(nightToPlot + days(1) + hours(2)), 
+                                   as.POSIXct(nightToPlot + hours(20) + minutes(45)),
+                          units = "hours"))
+  
+  framesOutputDir <- "output/frames"
   
   anim = animate(static + 
                    transition_components(ObsTime,
+                                         range = c(as.POSIXct(nightToPlot + hours(20) + minutes(45)),
+                                                   as.POSIXct(nightToPlot + days(1) + hours(2))),
                                          # # enter_length = as_datetime(hm("0:5")),
                                          exit_length = as_datetime(hm("0:30"))) + 
                    # enter_fade() +
@@ -204,15 +208,28 @@ for (i in 1:length(nights)) {
                  fps = 8,
                  width = 600,
                  height = 600,
-                 bg = "transparent")
+                 bg = "transparent",
+                 ## UNCOMMENT THESE LINES to generate stills rather than a GIF
+                 # device = "png",
+                 # renderer = file_renderer(framesOutputDir, prefix = str_glue("{i}_"), overwrite = TRUE)
+                 )
   
-  anim 
+  # anim 
   
-  anim_save(str_glue("output/temp_scoter_hiFreq_{nightStr}.gif"))
+  anim_save(str_glue("output/final_scoter_hiFreq_{nightStr}.gif"))
 }
 
 
-# Combined dates ----------------------------------------------------------
+# combine all frames into a single gif ------------------------------------
+
+png_files <- list.files(framesOutputDir,full.names = T)
+gif_file <- "output/final_scoter_hiFreq_combined.gif"
+# gif_file = tempfile(fileext = ".gif")
+gifski(png_files, gif_file,width = 600,height = 600,delay = 1.0/8.0)
+utils::browseURL(gif_file)
+
+# all dates superimposed ----------------------------------------------------------
+nightLevels = format(nights,"%d %B %Y")
 
 toPlotCombined = geoCodedScoter %>% 
   filter(baseDate >= min(nights),
@@ -221,29 +238,52 @@ toPlotCombined = geoCodedScoter %>%
          !is.na(lat),
          lat != 0,
          includeInVis) %>% 
-  mutate(Night = factor(baseDate))
+  mutate(Night = factor(format(baseDate,"%d %B %Y"),levels = nightLevels))
 
 static = ggplot(toPlotCombined) + 
   geom_polygon(data = uk , aes(x=long, y = lat, group = group),fill = "white") +
   geom_point(aes(x = lon,y = lat,group = obsID,color = Night),
              size = 4) +
-  coord_map() +
-  theme_black() 
+  coord_map(xlim = c(-14,4)) +
+  theme_black() +
+  # theme_ft_rc(grid = F) +
+  labs(title = "Common Scoter Nocturnal Migration",
+       subtitle = "D. Bradnum, J. Dunning, A. Lees, O.Metcalf",
+       # caption = str_glue("{format(nightToPlot,'%d %B %Y')}"),
+       tag = "01:00") +
+  theme(plot.title = element_text(size = rel(1.5),face = "bold"),
+        plot.subtitle = element_text(size = rel(0.9),face = "italic"),
+        plot.caption = element_text(hjust=0.5, size=rel(1.5)),
+        plot.tag = element_text(margin = margin(l = -100,
+                                                b = -40),
+                                size = rel(3),face = "bold"),
+        plot.tag.position = "topright",
+        legend.text = element_text(size = rel(1)),
+        legend.title = element_blank(),
+        legend.position = "bottom") 
 
 static
 
-
-nHrsInPlot = hour(as.period(max(toPlotCombined$standardisedTime) - min(toPlotCombined$standardisedTime),"hours"))
+nHrsInPlot = as.numeric(difftime(as.POSIXct(today() + days(1) + hours(2)),
+                                 as.POSIXct(today() + hours(20) + minutes(45)), 
+                                 units = "hours"))
 
 anim = animate(static + 
                  transition_components(standardisedTime,
+                                       range = c(as.POSIXct(today() + hours(20) + minutes(45)),
+                                                 as.POSIXct(today() + days(1) + hours(2))),
                                        # # enter_length = as_datetime(hm("0:5")),
                                        exit_length = as_datetime(hm("0:30"))) + 
                  # enter_fade() +
                  exit_fade() +
                  exit_shrink() +
-                 shadow_mark(past = T,future = F,alpha = 0.3,size = size/2) +
-                 ggtitle("Common Scoter Nocturnal Migration: {format(frame_time, '%H:%M')}"),
+                 shadow_mark(past = T,future = F,alpha = 0.4,size = size/2) +
+                 labs(title = "Common Scoter Nocturnal Migration",
+                      subtitle = "D. Bradnum, J. Dunning, A. Lees, O.Metcalf",
+                      tag = "{format(frame_time, '%H:%M')}")
+                      # caption = "{format(frame_time,'%d %B %Y')}")
+               ,
+               end_pause = 20,
                # nframes = 50,
                nframes = nHrsInPlot * 60,
                fps = 8,
@@ -251,7 +291,7 @@ anim = animate(static +
                height = 600,
                bg = "transparent")
 
- # anim
+# anim 
 
 anim_save(str_glue("output/scoter_hiFreq_allDays.gif"))
 
