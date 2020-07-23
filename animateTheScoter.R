@@ -78,13 +78,20 @@ geocoder = function(location) {
 }
 
 # aim to top up existing list of geocoded sites
-allGeo = read_csv("output/geocodedSites.csv")
+geocodedSiteData <- "output/geocodedSites.csv"
 
-newSites = sites %>% anti_join(allGeo)
+# if we already have geo data, read it and figure out what's missing
+if (file.exists(geocodedSiteData)) {
+  allGeo = read_csv(geocodedSiteData)
+  newSites = sites %>% anti_join(allGeo)
+} else {
+  # otherwise, we'll just get everything
+  newSites = sites
+}
 
 if (nrow(newSites) > 0){
   # this will take a minute or two...
-  newGeo = newSites %>% 
+  newGeo = newSites %>%
     mutate(geocode = map(locationToSearch,
                          # handle geocoding errors
                          possibly(geocoder,otherwise = list()))) 
@@ -93,11 +100,14 @@ if (nrow(newSites) > 0){
     unnest_wider(geocode) %>% 
     select(locationToSearch,lat,lon)
   
-  allGeo = rbind(allGeo,newGeo)
-  
+  if (exists("allGeo")) {
+    allGeo = rbind(allGeo,newGeo)
+  } else {
+    allGeo = newGeo
+  }
   # cache successful results for future use
   write_csv(allGeo %>% filter(!is.na(lat)),
-            "output/geocodedSites.csv")
+            geocodedSiteData)
 }
 
 geoCodedScoter = cleanScoter %>% 
